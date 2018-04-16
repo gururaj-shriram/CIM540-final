@@ -198,9 +198,9 @@ function gotData() {
 	if (isAdd) {
 		// push a new word to the list 
     wordList.push(generateWord())
-	}
+  }
 
-	if (isRemove) {
+  if (isRemove) {
 		// Add remove code
 	}
 
