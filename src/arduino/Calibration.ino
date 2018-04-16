@@ -1,77 +1,62 @@
 #include<Servo.h>
 
 // Changeable pins
-const int panPin = 2;
+const int joyStickXPin = A0;
+const int joyStickYPin = A1; 
+const int joyStickClickPin = 2; 
 const int tiltPin = 3;
-const int joystickXPin = 4;
-const int joystickYPin = 5;
+const int panPin = 4;
+const int addButtonPin = 5;
+const int removeButtonPin = 6;
 
-// Calibrated Midpoint of Joystick
-const int joystickMidX = 512;
-const int joystickMidY = 512;
-
-// Temp variables to receive raw input and calc offsets
-int servoVal = 0;
-int offset = 0;
-
-// Rough Midpoint of Joystick (0, 0)
-// May need to be calibrated
-int prevJoystickX = joystickMidX;
-int prevJoystickY = joystickMidY;
+int servoVal;
 
 Servo pan;
 Servo tilt;
 
 void printRawJoystickValues() {
   Serial.print("Raw Joystick X: ");
-  Serial.println(analogReady(joyStickXPin));
-  Serial.print("Raw Joystick Y: ");
-  Serial.println(analogReady(joyStickYPin));
+  Serial.print(analogRead(joyStickXPin));
+  Serial.print(" Raw Joystick Y: ");
+  Serial.print(analogRead(joyStickYPin));
+  Serial.print(" Raw Joystick Click: ");
+  Serial.print(!digitalRead(joyStickClickPin));
+  Serial.print(" Add Button: ");
+  Serial.print(!digitalRead(addButtonPin));
+  Serial.print(" Remove Button: ");
+  Serial.print(!digitalRead(removeButtonPin));
 }
 
 void setup() {
-  pan.attach(2);
-  tilt.attach(3);
-
+  pan.attach(panPin);
+  tilt.attach(tiltPin);
+  
   Serial.begin(9600);
+  pinMode(joyStickClickPin, INPUT_PULLUP);
+  pinMode(addButtonPin, INPUT_PULLUP);
+  pinMode(removeButtonPin, INPUT_PULLUP);
 }
 
 void loop() {
 
   printRawJoystickValues();
 
-  // Calculate adjusted joystick X
-  offset = prevJoystickX - joystickMidX;
-  servoVal = analogReady(joyStickXPin);
-  servoVal += offset;
-  constrain(servoVal, 0, 1023);
-
-  prevJoystickX = servoVal;
-
-  // Map adjusted joystick val to pan val
+  servoVal = analogRead(joyStickXPin);
   servoVal = map(servoVal, 0, 1023, 0, 179);
 
-  Serial.print("Pan Val: ");
-  Serial.println(servoVal);
+  Serial.print(" Pan Val: ");
+  Serial.print(servoVal);
 
   pan.write(servoVal);
 
-  // Calculate adjusted joystick Y
-  offset = prevJoystickY - joystickMidY;
-  servoVal = analogReady(joyStickYPin);
-  servoVal += offset;
-  constrain(servoVal, 0, 1023);
-
-  prevJoystickY = servoVal;
-
-  // Map adjusted joystick val to tilt val
+  servoVal = analogRead(joyStickYPin);
   servoVal = map(servoVal, 0, 1023, 0, 179);
 
-  Serial.print("Tilt Val: ");
+  Serial.print(" Tilt Val: ");
   Serial.println(servoVal);
 
   tilt.write(servoVal);
-
+  
   // delay till servo reaches position
   delay(15);
 }
