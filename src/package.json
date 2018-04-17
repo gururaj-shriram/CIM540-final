@@ -1,0 +1,23 @@
+{
+  "name": "word_story",
+  "version": "1.0.0",
+  "description": "Word Story",
+  "main": "sketch.js",
+  "scripts": {
+    "start": "node startserver.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gururaj-shriram/CIM540-final.git"
+  },
+  "author": "jerry bonnell and gururaj shriram",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gururaj-shriram/CIM540-final/issues"
+  },
+  "dependencies": {
+    "serialport": "^4.0.3",
+    "ws": "^1.1.1"
+  },
+  "homepage": "https://github.com/gururaj-shriram/CIM540-final#readme"
+}

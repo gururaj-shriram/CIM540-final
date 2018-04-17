@@ -2,10 +2,12 @@
   CIM540/CIM542 Final Project
 
   authors: jerry bonnell and gururaj shriram
-  date last modified: 16 apr 2018
+  date last modified: 17 apr 2018
   */
 
-  var backgroundColor = "#242930";
+const IS_USING_ARDUINO_CONTROLLER = false;
+
+var backgroundColor = "#242930";
 // current words displayed on the screen 
 var wordList = [];
 // list of constructed words created by the user  
@@ -34,6 +36,7 @@ var padding = [6,4];
 var hitbox = [6, 10];
 
 var serial;
+// change based on arduino port
 var serialPort = '/dev/cu.usbmodem1421';
 var cursorX, cursorY;
 
@@ -47,13 +50,15 @@ var maxTiltY = 179;
 function setup() {
 	windowResized();
 
-	serial = new p5.SerialPort();
-	serial.open(serialPort);
+  if (IS_USING_ARDUINO_CONTROLLER) {
+  	serial = new p5.SerialPort();
+  	serial.open(serialPort);
 
-  // serial callbacks
-  serial.on('data', gotData);
-  serial.on('error', gotError);
-  serial.on('open', gotOpen);
+    // serial callbacks
+    serial.on('data', gotData);
+    serial.on('error', gotError);
+    serial.on('open', gotOpen);
+  }
 }
 
 function draw() {
@@ -62,10 +67,10 @@ function draw() {
 }
 
 function updateCursor() {
-	if (!serial.isConnected()) {
+  if (!IS_USING_ARDUINO_CONTROLLER) {
 		cursorX = mouseX;
 		cursorY = mouseY;
-	}
+	} 
 }
 
 function render() {
@@ -89,7 +94,6 @@ function render() {
     rect(x, y, wordObj.width, wordObj.height);
     fill(255, 255, 255);
   })
-
 }
 
 function generateWord() {
@@ -177,7 +181,9 @@ function gotOpen() {
 }
 
 function gotError(err) {
-	console.log('Serial error: \n' + err);
+  if (err) {
+  	console.log('Serial error: \n' + err);
+  }
 }
 
 function gotData() {
