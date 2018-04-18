@@ -6,8 +6,8 @@ const int joystickXPin = A1;
 const int tiltPin = 3;
 const int panPin = 4;
 
-const int minServoOffset = -4;
-const int maxServoOffset = 4;
+const int minServoOffset = -3;
+const int maxServoOffset = 3;
 
 // Temp variables to receive raw input and calc offsets
 int servoVal = 0;
@@ -23,8 +23,8 @@ Servo pan;
 Servo tilt;
 
 void setup() {
-//  pan.attach(panPin);
-//  tilt.attach(tiltPin);
+  pan.attach(panPin);
+  tilt.attach(tiltPin);
   
   Serial.begin(9600);
 }

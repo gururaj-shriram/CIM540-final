@@ -2,7 +2,7 @@
   CIM540/CIM542 Final Project
 
   authors: jerry bonnell and gururaj shriram
-  date last modified: 17 apr 2018
+  date last modified: 18 apr 2018
   */
 
 const IS_USING_ARDUINO_CONTROLLER = false;
@@ -35,10 +35,14 @@ var padding = [6,4];
 // hitbox width and height
 var hitbox = [6, 10];
 
-var serial;
-// change based on arduino port
-var serialPort = '/dev/cu.usbmodem1421';
 var cursorX, cursorY;
+
+var offset = 5;
+
+var serial;
+
+// change based on arduino port
+var serialPort = '/dev/cu.usbmodem1411';
 
 // calibrate these parameters before running if the Arduino controller 
 // is used
@@ -94,6 +98,11 @@ function render() {
     rect(x, y, wordObj.width, wordObj.height);
     fill(255, 255, 255);
   })
+
+  if (IS_USING_ARDUINO_CONTROLLER) {
+    fill(255, 255, 255); // white text
+    text('X', cursorX, cursorY);
+  }
 }
 
 function generateWord() {
@@ -192,8 +201,15 @@ function gotData() {
 	// panValue tiltValue addButtonState removeButtonState joystickButtonState
 	var data = serial.readLine().trim().split(' ');
 
-	var xPos = map(int(data[0]), minPanX, maxPanX, 0, width);
-	var yPos = map(int(data[1]), minTiltY, maxTiltY, 0, height);
+  console.log(data);
+
+  // Empty packet from arduino
+  if (data.length !== 5) {
+    return;
+  }
+
+	var xPos = map(int(data[0]), minPanX, maxPanX, 0, width - offset);
+	var yPos = map(int(data[1]), minTiltY, maxTiltY, 0, height- offset);
 	var isAdd = int(data[2]) === 1 ? true : false;
 	var isRemove = int(data[3]) === 1 ? true : false;
 	var isJoystickClick = int(data[4]) === 1 ? true : false;

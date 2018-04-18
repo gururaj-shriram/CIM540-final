@@ -1,5 +1,10 @@
 #include<Servo.h>
 
+// The joystick on the controller is rotated 90 degrees counterclockwise
+// from where it should be. Hence, "X" corresponds to the "Y" direction
+// and vice-a-versa. Further the "Y" on the joystick ("X" for the controller) is flipped, 
+// so that 0 is actually 1023 and vice-a-versa
+
 // Changeable pins
 const int joystickYPin = A0; 
 const int joystickXPin = A1;
@@ -9,8 +14,8 @@ const int panPin = 4;
 const int addButtonPin = 5;
 const int removeButtonPin = 6;
 
-const int minServoOffset = -4;
-const int maxServoOffset = 4;
+const int minServoOffset = -3;
+const int maxServoOffset = 3;
 const int doSomethingVal = 1;
 const int doNothingVal = 0;
 
@@ -80,8 +85,7 @@ void loop() {
   prevTiltVal = servoVal;
   
   // Write tilt val second
-  // It is flipped for the p5 canvas
-  Serial.print(179 - servoVal);
+  Serial.print(servoVal);
   Serial.print(" ");
   tilt.write(servoVal);
 
@@ -122,7 +126,6 @@ void loop() {
     Serial.print(doNothingVal);
     Serial.print(" ");
   }
-
   
   buttonState = digitalRead(joystickClickPin);
 
