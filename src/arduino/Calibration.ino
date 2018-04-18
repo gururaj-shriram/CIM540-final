@@ -1,62 +1,76 @@
 #include<Servo.h>
 
 // Changeable pins
-const int joyStickXPin = A0;
-const int joyStickYPin = A1; 
-const int joyStickClickPin = 2; 
+const int joystickYPin = A0; 
+const int joystickXPin = A1;
 const int tiltPin = 3;
 const int panPin = 4;
-const int addButtonPin = 5;
-const int removeButtonPin = 6;
 
-int servoVal;
+const int minServoOffset = -4;
+const int maxServoOffset = 4;
+
+// Temp variables to receive raw input and calc offsets
+int servoVal = 0;
+int joystickVal = 0;
+int buttonState;
+int temp = 0;
+
+// Hashed Values
+int prevPanVal = 90;
+int prevTiltVal = 90;
 
 Servo pan;
 Servo tilt;
 
-void printRawJoystickValues() {
-  Serial.print("Raw Joystick X: ");
-  Serial.print(analogRead(joyStickXPin));
-  Serial.print(" Raw Joystick Y: ");
-  Serial.print(analogRead(joyStickYPin));
-  Serial.print(" Raw Joystick Click: ");
-  Serial.print(!digitalRead(joyStickClickPin));
-  Serial.print(" Add Button: ");
-  Serial.print(!digitalRead(addButtonPin));
-  Serial.print(" Remove Button: ");
-  Serial.print(!digitalRead(removeButtonPin));
-}
-
 void setup() {
-  pan.attach(panPin);
-  tilt.attach(tiltPin);
+//  pan.attach(panPin);
+//  tilt.attach(tiltPin);
   
   Serial.begin(9600);
-  pinMode(joyStickClickPin, INPUT_PULLUP);
-  pinMode(addButtonPin, INPUT_PULLUP);
-  pinMode(removeButtonPin, INPUT_PULLUP);
 }
 
 void loop() {
+// Move pan
+  joystickVal = analogRead(joystickXPin);
+  temp = map(joystickVal, 0, 1023, minServoOffset, maxServoOffset);
 
-  printRawJoystickValues();
-
-  servoVal = analogRead(joyStickXPin);
-  servoVal = map(servoVal, 0, 1023, 0, 179);
-
-  Serial.print(" Pan Val: ");
-  Serial.print(servoVal);
-
+  // To decrease sensitivity
+  if (temp >= -1 && temp <= 1) {
+    temp = 0;
+  }
+  
+  servoVal = prevPanVal + temp;
+  servoVal = constrain(servoVal, 0, 179);
+  prevPanVal = servoVal;
+  
+  // Write pan val first
+  // It is flipped for the p5 canvas
+  Serial.print("X: ");
+  Serial.print(179 - servoVal);
+  Serial.print(" ");
   pan.write(servoVal);
 
-  servoVal = analogRead(joyStickYPin);
-  servoVal = map(servoVal, 0, 1023, 0, 179);
-
-  Serial.print(" Tilt Val: ");
-  Serial.println(servoVal);
-
-  tilt.write(servoVal);
+  // Move tilt
+  joystickVal = analogRead(joystickYPin);
   
-  // delay till servo reaches position
-  delay(15);
+  // For controller, tilt is swapped due to the direction laser moves
+  joystickVal = 1023 - joystickVal;    
+  
+  temp = map(joystickVal, 0, 1023, minServoOffset, maxServoOffset);
+
+  // To decrease sensitivity
+  if (temp >= -1 && temp <= 1) {
+    temp = 0;
+  }
+  
+  servoVal = prevTiltVal + temp;
+  servoVal = constrain(servoVal, 0, 179);
+  prevTiltVal = servoVal;
+  
+  // Write tilt val second
+  // It is flipped for the p5 canvas
+  Serial.print("Y: ");
+  Serial.print(179 - servoVal);
+  Serial.println();
+  tilt.write(servoVal);
 }

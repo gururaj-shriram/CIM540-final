@@ -1,32 +1,31 @@
 #include<Servo.h>
 
 // Changeable pins
-const int joyStickXPin = A0;
-const int joyStickYPin = A1; 
-const int joyStickClickPin = 2; 
+const int joystickYPin = A0; 
+const int joystickXPin = A1;
+const int joystickClickPin = 2; 
 const int tiltPin = 3;
 const int panPin = 4;
 const int addButtonPin = 5;
 const int removeButtonPin = 6;
 
-const int minServoOffset = -5;
-const int maxServoOffset = 5;
-const int servoDelay = 15;
-const int doNothingVal = -1;
+const int minServoOffset = -4;
+const int maxServoOffset = 4;
+const int doSomethingVal = 1;
+const int doNothingVal = 0;
 
 // Temp variables to receive raw input and calc offsets
 int servoVal = 0;
 int joystickVal = 0;
 int buttonState;
-int prevMillis = 0;
-int temp;
+int temp = 0;
 
 // Hashed Values
 int prevPanVal = 90;
 int prevTiltVal = 90;
 int prevAddButtonState = 0;
 int prevRemoveButtonState = 0;
-int prevJoystickButtonState = 0;
+int prevjoystickButtonState = 0;
 
 Servo pan;
 Servo tilt;
@@ -35,7 +34,7 @@ void setup() {
   pan.attach(panPin);
   tilt.attach(tiltPin);
 
-  pinMode(joyStickClickPin, INPUT_PULLUP);
+  pinMode(joystickClickPin, INPUT_PULLUP);
   pinMode(addButtonPin, INPUT_PULLUP);
   pinMode(removeButtonPin, INPUT_PULLUP);
   
@@ -44,47 +43,47 @@ void setup() {
 
 void loop() {
 
-  // Used to delay moving servos until they reach the previous position
-  if (prevMillis - millis() >= servoDelay) { 
+  // Move pan
+  joystickVal = analogRead(joystickXPin);
+  temp = map(joystickVal, 0, 1023, minServoOffset, maxServoOffset);
 
-    prevMillis = millis();
-    
-    joystickVal = analogRead(joyStickXPin);
-    temp = map(joystickVal, 0, 1023, minServoOffset, maxServoOffset);
-    
-    servoVal = prevPanVal;
-    servoVal += temp;
-
-    constrain(servoVal, 0, 179);
-    
-    // Write pan val first
-    Serial.write(servoVal);
-    Serial.write(" ");
-    pan.write(servoVal);
-
-    prevPanVal = servoVal;
-  
-    joystickVal = analogRead(joyStickYPin);
-    temp = map(joystickVal, 0, 1023, minServoOffset, maxServoOffset);
-    
-    servoVal = prevTiltVal;
-    servoVal += temp;
-
-    constrain(servoVal, 0, 179);
-    
-    // Write tilt val second
-    Serial.write(servoVal);
-    Serial.write(" ");
-    tilt.write(servoVal);
-
-    prevTiltVal = servoVal;
-    } else {
-    // Write prev servo vals
-    Serial.write(prevPanVal);
-    Serial.write(" ");
-    Serial.write(prevTiltVal);
-    Serial.write(" ");
+  // To decrease sensitivity
+  if (temp >= -1 && temp <= 1) {
+    temp = 0;
   }
+  
+  servoVal = prevPanVal + temp;
+  servoVal = constrain(servoVal, 0, 179);
+  prevPanVal = servoVal;
+  
+  // Write pan val first
+  // It is flipped for the p5 canvas
+  Serial.print(179 - servoVal);
+  Serial.print(" ");
+  pan.write(servoVal);
+
+  // Move tilt
+  joystickVal = analogRead(joystickYPin);
+  
+  // For controller, tilt is swapped due to the direction laser moves
+  joystickVal = 1023 - joystickVal;    
+  
+  temp = map(joystickVal, 0, 1023, minServoOffset, maxServoOffset);
+
+  // To decrease sensitivity
+  if (temp >= -1 && temp <= 1) {
+    temp = 0;
+  }
+  
+  servoVal = prevTiltVal + temp;
+  servoVal = constrain(servoVal, 0, 179);
+  prevTiltVal = servoVal;
+  
+  // Write tilt val second
+  // It is flipped for the p5 canvas
+  Serial.print(179 - servoVal);
+  Serial.print(" ");
+  tilt.write(servoVal);
 
   buttonState = digitalRead(addButtonPin);
 
@@ -92,11 +91,17 @@ void loop() {
     prevAddButtonState = buttonState;
     
     // Write add button state third
-    Serial.write(buttonState);
-    Serial.write(" ");
+    // 0 is on in INPUT_PULLUP
+    if (buttonState == 0) {
+      Serial.print(doSomethingVal);
+      Serial.print(" ");
+    } else {
+      Serial.print(doNothingVal);
+      Serial.print(" ");
+    }
   } else {
-    Serial.write(doNothingVal);
-    Serial.write(" ");
+    Serial.print(doNothingVal);
+    Serial.print(" ");
   }
 
   buttonState = digitalRead(removeButtonPin);
@@ -105,24 +110,36 @@ void loop() {
     prevRemoveButtonState = buttonState;
     
     // Write remove button state fourth
-    Serial.write(buttonState);
-    Serial.write(" ");
+    // 0 is on in INPUT_PULLUP
+    if (buttonState == 0) {
+      Serial.print(doSomethingVal);
+      Serial.print(" ");
+    } else {
+      Serial.print(doNothingVal);
+      Serial.print(" ");
+    }
   } else {
-    Serial.write(doNothingVal);
-    Serial.write(" ");
+    Serial.print(doNothingVal);
+    Serial.print(" ");
   }
 
   
-  buttonState = digitalRead(joyStickClickPin);
+  buttonState = digitalRead(joystickClickPin);
 
-  if (buttonState != prevJoystickButtonState) {
-    prevJoystickButtonState = buttonState;
+  if (buttonState != prevjoystickButtonState) {
+    prevjoystickButtonState = buttonState;
     
     // Write joystick button state fifth
-    Serial.write(buttonState);
-    Serial.write("\n");
+    // 0 is on in INPUT_PULLUP
+    if (buttonState == 0) {
+      Serial.print(doSomethingVal);
+      Serial.println();
+    } else {
+      Serial.print(doNothingVal);
+      Serial.println();
+    }
   } else {
-    Serial.write(doNothingVal);
-    Serial.write("\n");
+    Serial.print(doNothingVal);
+    Serial.println();
   }
 }
