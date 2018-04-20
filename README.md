@@ -1,12 +1,14 @@
 # Word Story
+### A tetris-like, story making game… with a laser!
 
-Word Story is a game projected onto a medium using an Arduino powered controller that's used to create stories with randomly generated words!
+Word Story is a game that lets the player create stories from randomly generated words. Players can add random words, delete random words, and move words from one position to another in order to try to create a story. Word Story is best played as a projection on a screen with its physical controller, which uses a joystick that controls a laser to move around the screen; it can also be played on a computer screen using the mouse and keyboard as a controller. 
 
 ## Instructions
 
 ### With the Arduino Controller
 
-First, project the laptop screen to a medium, such as a wall. If necessary, change the pins in the Arduino programs to reflect the setup.
+First, project the laptop onto a larger physical surface. If necessary, change the pins in the Arduino programs to reflect the setup.
+
 Run the Calibration Arduino program and move the laser to the top left and bottom right positions of the projected screen. These values will be modified in the `sketch.js` min and max X and Y values. Once these values have been recorded, we are ready to begin. Ensure that the flag in `sketch.js` to use the Arduino controller is enabled, and that the port used for the Arduino is changed. 
 
 To begin Word Story, connect the Arduino to the computer, upload `Word_Story.ino`, and run
