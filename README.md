@@ -1,7 +1,7 @@
-# Word Story
+# Word Jam
 ### A tetris-like, story making game… with a laser!
 
-Word Story is a game that lets the player create stories from randomly generated words. Players can add random words, delete random words, and move words from one position to another in order to try to create a story. Word Story is best played as a projection on a screen with its physical controller, which uses a joystick that controls a laser to move around the screen; it can also be played on a computer screen using the mouse and keyboard as a controller. 
+Word Jam is a game that lets the player create stories from randomly generated words. Players can add random words, delete random words, and move words from one position to another in order to try to create a story. Word Jam is best played as a projection on a screen with its physical controller, which uses a joystick that controls a laser to move around the screen; it can also be played on a computer screen using the mouse and keyboard as a controller. 
 
 ## Instructions
 
@@ -11,7 +11,7 @@ First, project the laptop onto a larger physical surface. If necessary, change t
 
 Run the Calibration Arduino program and move the laser to the top left and bottom right positions of the projected screen. These values will be modified in the `sketch.js` min and max X and Y values. Once these values have been recorded, we are ready to begin. Ensure that the flag in `sketch.js` to use the Arduino controller is enabled, and that the port used for the Arduino is changed. 
 
-To begin Word Story, connect the Arduino to the computer, upload `Word_Story.ino`, and run
+To begin Word Jam, connect the Arduino to the computer, upload `Word_Story.ino`, and run
 
 ```shell
 $ npm start
