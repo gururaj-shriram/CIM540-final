@@ -11,11 +11,15 @@ const int joystickXPin = A1;
 const int joystickClickPin = 2; 
 const int tiltPin = 3;
 const int panPin = 4;
-const int addButtonPin = 5;
-const int removeButtonPin = 6;
+const int addButtonPin = 6;
+const int removeButtonPin = 5;
 
-const int minServoOffset = -3;
-const int maxServoOffset = 3;
+const int minPanValue = 600;
+const int maxPanValue = 2300;
+const int minTiltValue = 900;
+const int maxTiltValue = 2300;
+const int minServoOffset = -5;
+const int maxServoOffset = 5;
 const int doSomethingVal = 1;
 const int doNothingVal = 0;
 
@@ -26,8 +30,8 @@ int buttonState;
 int temp = 0;
 
 // Hashed Values
-int prevPanVal = 90;
-int prevTiltVal = 90;
+int prevPanVal = 1500;
+int prevTiltVal = minTiltValue;
 int prevAddButtonState = 0;
 int prevRemoveButtonState = 0;
 int prevjoystickButtonState = 0;
@@ -58,20 +62,17 @@ void loop() {
   }
   
   servoVal = prevPanVal + temp;
-  servoVal = constrain(servoVal, 0, 179);
+  servoVal = constrain(servoVal, minPanValue, maxPanValue);
   prevPanVal = servoVal;
   
   // Write pan val first
   // It is flipped for the p5 canvas
-  Serial.print(179 - servoVal);
+  Serial.print(maxPanValue - servoVal);
   Serial.print(" ");
-  pan.write(servoVal);
+  pan.writeMicroseconds(servoVal);
 
   // Move tilt
-  joystickVal = analogRead(joystickYPin);
-  
-  // For controller, tilt is swapped due to the direction laser moves
-  joystickVal = 1023 - joystickVal;    
+  joystickVal = analogRead(joystickYPin);  
   
   temp = map(joystickVal, 0, 1023, minServoOffset, maxServoOffset);
 
@@ -81,13 +82,13 @@ void loop() {
   }
   
   servoVal = prevTiltVal + temp;
-  servoVal = constrain(servoVal, 0, 179);
+  servoVal = constrain(servoVal, minTiltValue, maxTiltValue);
   prevTiltVal = servoVal;
   
   // Write tilt val second
-  Serial.print(servoVal);
+  Serial.print(maxTiltValue - servoVal);
   Serial.print(" ");
-  tilt.write(servoVal);
+  tilt.writeMicroseconds(servoVal);
 
   buttonState = digitalRead(addButtonPin);
 

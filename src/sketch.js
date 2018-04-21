@@ -13,7 +13,7 @@ var backgroundColor = "#242930";
 
 var cursorX, cursorY;
 
-var offset = 5;
+var offset = 10;
 
 var serial;
 
@@ -22,10 +22,10 @@ var serialPort = '/dev/cu.usbmodem1411';
 
 // calibrate these parameters before running if the Arduino controller 
 // is used
-var minPanX = 0;
-var maxPanX = 179;
-var minTiltY = 0;
-var maxTiltY = 179;
+var minPanX = 507;
+var maxPanX = 1105;
+var minTiltY = 1151;
+var maxTiltY = 1400;
 
 function setup() {
   
@@ -103,15 +103,20 @@ function gotData() {
 	// panValue tiltValue addButtonState removeButtonState joystickButtonState
 	var data = serial.readLine().trim().split(' ');
 
-  console.log(data);
 
   // Empty packet from arduino
   if (data.length !== 5) {
     return;
   }
 
-	var xPos = map(int(data[0]), minPanX, maxPanX, 0, width - offset);
-	var yPos = map(int(data[1]), minTiltY, maxTiltY, 0, height- offset);
+  console.log(data);
+
+	var xPos = constrain(int(data[0]), minPanX, maxPanX);
+	xPos = map(xPos, minPanX, maxPanX, 0 + offset, width - offset);
+
+	var yPos = constrain(int(data[1]), minTiltY, maxTiltY);
+	yPos = map(yPos, minTiltY, maxTiltY, 0 + offset, height - offset);
+	
 	var isAdd = int(data[2]) === 1 ? true : false;
 	var isRemove = int(data[3]) === 1 ? true : false;
 	var isJoystickClick = int(data[4]) === 1 ? true : false;
