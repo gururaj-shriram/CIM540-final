@@ -6,7 +6,7 @@
   file: words.js 
   authors: jerry bonnell and gururaj shriram
   date last modified: 21 apr 2018
-  last modified by: jerry
+  last modified by: guru
 */
 
 // current words displayed on the screen 
@@ -33,9 +33,11 @@ var uuid = 0;
 // offset width and height
 var selectedOffsets = [0, 0];
 // padding width and height 
-var padding = [6, 4];
+var padding = [14, 14];
 // hitbox width and height
 var hitbox = [15, 30];
+
+const yOffset = 15;
 
 function generateWord() {
   var word;
@@ -227,7 +229,7 @@ function renderWords() {
         var node = currentSentence.head;
         // render the words in the linked list
         while (node !== undefined) {
-          text(node.word, node.x + padding[0], node.y + 10 + padding[1]);
+          text(node.word, node.x + padding[0], node.y + yOffset + padding[1]);
           fill('rgba(0,255,0, 0)');
           rect(node.x, node.y, node.width, node.height);
           fill(255, 255, 255);
@@ -238,7 +240,7 @@ function renderWords() {
 
     } else {
       // it's a static (not moving) word/sentence
-      text(word, x + padding[0], y + 10 + padding[1]);
+      text(word, x + padding[0], y + yOffset + padding[1]);
       fill('rgba(0,255,0, 0)');
       rect(x, y, wordObj.width, wordObj.height);
       fill(255, 255, 255);

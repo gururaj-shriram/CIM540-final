@@ -4,14 +4,12 @@
   file: sketch.js 
   authors: jerry bonnell and gururaj shriram
   date last modified: 21 apr 2018
-  last modified by: jerry
+  last modified by: guru
 */
 
 const IS_USING_ARDUINO_CONTROLLER = false;
 
 var backgroundColor = "#242930";
-
-var font; 
 
 var cursorX, cursorY;
 
@@ -30,7 +28,8 @@ var minTiltY = 0;
 var maxTiltY = 179;
 
 function setup() {
-	windowResized();
+  
+  windowResized();
 
   if (IS_USING_ARDUINO_CONTROLLER) {
   	serial = new p5.SerialPort();
@@ -57,6 +56,9 @@ function updateCursor() {
 
 function render() {
 	background(backgroundColor); 
+	textFont("Gloria Hallelujah");
+	textSize(24);
+
   //noStroke();
   fill(255, 255, 255); // white text
 
@@ -119,11 +121,12 @@ function gotData() {
 
 	if (isAdd) {
 		// push a new word to the list 
-    wordList.push(generateWord())
-  }
+		wordList.push(generateWord())
+	}		
 
   if (isRemove) {
-		// Add remove code
+  	// remove word at cursor
+		removeWord();
 	}
 
 	// Grab or deselect word if there's a joystick click
@@ -131,4 +134,3 @@ function gotData() {
 		moveWords();		
 	}
 }
-
