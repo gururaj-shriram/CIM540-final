@@ -1,7 +1,12 @@
-# Word Jam
+# CIM540 Final Project: Word Jam
 ### A tetris-like, story making game… with a laser!
 
 Word Jam is a game that lets the player create stories from randomly generated words. Players can add random words, delete random words, and move words from one position to another in order to try to create a story. Word Jam is best played as a projection on a screen with its physical controller, which uses a joystick that controls a laser to move around the screen; it can also be played on a computer screen using the mouse and keyboard as a controller. 
+
+### Authors 
+
+* Gururaj Shriram (physical computing)
+* Jerry Bonnell (front-end)
 
 ## Instructions
 
