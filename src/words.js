@@ -5,37 +5,36 @@
 
   file: words.js 
   authors: jerry bonnell and gururaj shriram
-  date last modified: 21 apr 2018
-  last modified by: guru
+  date last modified: 22 apr 2018
+  last modified by: jerry
 */
 
 // current words displayed on the screen 
 var wordList = [];
 // part of speech tags 
-var nounTags = ['nn', 'nns', 'nnp', 'nnps'];
+var nounTags = ['nn', 'nns'];
 var verbTags = ['vb', 'vbd', 'vbg', 'vbn', 'vbp', 'vbz'];
-var otherTags = ['cc', 'cd', 'dt', 'ex', 'fw', 'in', 'jj', 'jjr', 'jjs', 'ls',
-  'md', 'pdt', 'pos', 'prp', 'prp$', 'rb', 'rbr', 'rbs', 'rp', 'sym', 'to', 'uh',
-  'wdt', 'wp', 'wp$', 'wrb'
-];
+var otherTags = ['prp', 'prp$', 'cc']; 
+//var otherTags = ['cc', 'cd', 'dt', 'ex', 'in', 'jj', 'jjr', 'jjs',
+//  'md', 'prp', 'prp$', 'rb', 'rbr', 'rbs', 'to', 'uh', 'wdt', 'wp', 'wp$', 'wrb'
+//];
 // get a list of stopwords, e.g. the, you, me, but, .. 
 var stopwords = RiTa.STOP_WORDS;
 // probability of selecting a stopword, noun, verb, other tag, respectively
 // later, this can be weighted and/or changed dynamically 
 var probabilities = [
-  [stopwords, 0.3],
-  [nounTags, 0.3],
-  [verbTags, 0.3],
-  [otherTags, 0.1]
+  [stopwords, 0.4],
+  [nounTags, 0.2],
+  [verbTags, 0.2],
+  [otherTags, 0.2]
 ];
-
 var uuid = 0;
 // offset width and height
 var selectedOffsets = [0, 0];
 // padding width and height 
 var padding = [14, 14];
 // hitbox width and height
-var hitbox = [15, 30];
+var hitbox = [15, 45];
 
 const yOffset = 15;
 
@@ -56,9 +55,11 @@ function generateWord() {
       // if the arr is from the stopwords list..
       if (arr === stopwords) {
         word = stopwords[index];
+        console.log(word + " " + stopwords[index])
       } else {
         // otherwise we need to generate it from randomWord()
         word = RiTa.randomWord(arr[index]);
+        console.log(word + " " + arr[index])
       }
 
       break;
@@ -76,7 +77,8 @@ function generateWord() {
     "height": height,
     "previous": undefined,
     "next": undefined,
-    "id": uuid++
+    "id": uuid++, 
+    "color": [globalColor[0], globalColor[1], globalColor[2]]
   }
 
 }
@@ -86,7 +88,10 @@ function removeWord() {
   if (currentSentence !== undefined) {
     var node = currentSentence.head;
     while (node !== undefined) {
+      // we want to remove everything in the linked list
       var index = wordList.indexOf(node);
+      // index should never return -1, but this is a hack
+      if (index === -1) break;
       wordList.splice(index, 1);
       node.previous = undefined;
       node = node.next;
@@ -197,10 +202,11 @@ function renderWords() {
             hitboxA = [wordObj2.x - hitbox[0] / 2,
               wordObj2.y + wordObj2.height / 2 - hitbox[1] / 2
             ];
-
+            //rect(hitboxA[0], hitboxA[1], hitbox[0], hitbox[1]);
             hitboxB = [wordObj2.x + wordObj2.width - hitbox[0] / 2,
               wordObj2.y + wordObj2.height / 2 - hitbox[1] / 2
             ];
+            //rect(hitboxB[0], hitboxB[1], hitbox[0], hitbox[1]);
             // check hitbox on the left 
             // also check if the word sitting there is occupied 
             if (wordObj2.previous === undefined &&
@@ -227,12 +233,25 @@ function renderWords() {
         })
 
         var node = currentSentence.head;
+        var size = getSize(node);
         // render the words in the linked list
         while (node !== undefined) {
-          text(node.word, node.x + padding[0], node.y + yOffset + padding[1]);
-          fill('rgba(0,255,0, 0)');
+          if(size === 1 || (node.previous === undefined 
+              && node.next === undefined)) {
+            // this is a solo word (size = 1) that is currently selected with 
+            // the cursor 
+            fill(globalColor[0], globalColor[1], globalColor[2]);
+          } else {
+            // otherwise we're picking up a sentence so we should use 
+            // its color instead
+            fill(node.color[0], node.color[1], node.color[2]);
+          }
+
+          strokeWeight(5);
           rect(node.x, node.y, node.width, node.height);
           fill(255, 255, 255);
+          strokeWeight(0);
+          text(node.word, node.x + padding[0], node.y + yOffset + padding[1]);
           node = node.next;
         }
 
@@ -240,10 +259,19 @@ function renderWords() {
 
     } else {
       // it's a static (not moving) word/sentence
-      text(word, x + padding[0], y + yOffset + padding[1]);
-      fill('rgba(0,255,0, 0)');
+      if(wordObj.previous === undefined && wordObj.next === undefined) {
+        // this is a static solo word (size = 1) 
+        fill(globalColor[0], globalColor[1], globalColor[2]);
+      } else {
+        // otherwise this is a static word with neighbors 
+        fill(wordObj.color[0], wordObj.color[1], wordObj.color[2]);
+      }
+
+      strokeWeight(5);
       rect(x, y, wordObj.width, wordObj.height);
       fill(255, 255, 255);
+      strokeWeight(0);
+      text(word, x + padding[0], y + yOffset + padding[1]);
     }
 
   })

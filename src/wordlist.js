@@ -4,7 +4,7 @@
   a linked list data structure to facilitate creation of sentences 
 
   authors: jerry bonnell and gururaj shriram
-  date last modified: 21 apr 2018
+  date last modified: 22 apr 2018
   last modified by: jerry
 */
 
@@ -58,4 +58,13 @@ function calculateListLocations(x, y) {
     }
 
     return summedWidth;
+}
+
+function getSize(head) {
+    var size = 0; 
+    while (head !== undefined) {
+        size++; 
+        head = head.next;
+    }
+    return size; 
 }
