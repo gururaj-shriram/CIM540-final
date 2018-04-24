@@ -1,10 +1,10 @@
 /*
-  CIM540/CIM542 Final Project
+CIM540/CIM542 Final Project
 
-  file: sketch.js 
-  authors: jerry bonnell and gururaj shriram
-  date last modified: 22 apr 2018
-  last modified by: jerry
+file: sketch.js 
+authors: jerry bonnell and gururaj shriram
+date last modified: 24 apr 2018
+last modified by: guru
 */
 
 const IS_USING_ARDUINO_CONTROLLER = false;
@@ -48,9 +48,28 @@ var colorDuration = 2.0;
 // frames per second
 var fps = 60;
 
+var addSound;
+var removeSound;
+var snapSound;
+
+function preload() {
+
+	soundFormats('mp3', 'wav');
+
+	addSound = loadSound('assets/add.mp3');
+	removeSound = loadSound('assets/remove.wav');
+	snapSound = loadSound('assets/snap.wav');
+}
+
 function setup() {
-	textFont("Gloria Hallelujah");
+
+	textFont('Gloria Hallelujah');
 	textSize(24);
+
+	addSound.setVolume(0.05);
+	removeSound.setVolume(0.1);
+	snapSound.setVolume(0.1);
+
 	windowResized(); 
 	frameRate(fps); // attempt to match the user-specified frame rate
 
@@ -58,9 +77,9 @@ function setup() {
 	wordList.push(generateWord()); 
 	wordList.pop();
 
-  if (IS_USING_ARDUINO_CONTROLLER) {
-  	serial = new p5.SerialPort();
-  	serial.open(serialPort);
+	if (IS_USING_ARDUINO_CONTROLLER) {
+		serial = new p5.SerialPort();
+		serial.open(serialPort);
 
     // serial callbacks
     serial.on('data', gotData);
@@ -100,7 +119,7 @@ function updateColors() {
 }
 
 function updateCursor() {
-  if (!IS_USING_ARDUINO_CONTROLLER) {
+	if (!IS_USING_ARDUINO_CONTROLLER) {
 		cursorX = mouseX;
 		cursorY = mouseY;
 	} 
@@ -124,9 +143,9 @@ function render() {
 function keyPressed() {
   if (keyCode === 80) { // pressing p 
 		// push a new word to the list 
-    wordList.push(generateWord())
+		wordList.push(generateWord())
   } else if (keyCode === 82) { // pressing r 
-    removeWord();
+  	removeWord();
   }
 }
 
@@ -143,9 +162,9 @@ function gotOpen() {
 }
 
 function gotError(err) {
-  if (err) {
-  	console.log('Serial error: \n' + err);
-  }
+	if (err) {
+		console.log('Serial error: \n' + err);
+	}
 }
 
 function gotData() {
@@ -157,33 +176,33 @@ function gotData() {
 
   // Empty packet from arduino
   if (data.length !== 5) {
-    return;
+  	return;
   }
 
   console.log(data);
 
-	var xPos = constrain(int(data[0]), minPanX, maxPanX);
-	xPos = map(xPos, minPanX, maxPanX, 0 + offset, width - offset);
+  var xPos = constrain(int(data[0]), minPanX, maxPanX);
+  xPos = map(xPos, minPanX, maxPanX, 0 + offset, width - offset);
 
-	var yPos = constrain(int(data[1]), minTiltY, maxTiltY);
-	yPos = map(yPos, minTiltY, maxTiltY, 0 + offset, height - offset);
-	
-	var isAdd = int(data[2]) === 1 ? true : false;
-	var isRemove = int(data[3]) === 1 ? true : false;
-	var isJoystickClick = int(data[4]) === 1 ? true : false;
+  var yPos = constrain(int(data[1]), minTiltY, maxTiltY);
+  yPos = map(yPos, minTiltY, maxTiltY, 0 + offset, height - offset);
+  
+  var isAdd = int(data[2]) === 1 ? true : false;
+  var isRemove = int(data[3]) === 1 ? true : false;
+  var isJoystickClick = int(data[4]) === 1 ? true : false;
 
-	cursorX = xPos;
-	cursorY = yPos;
+  cursorX = xPos;
+  cursorY = yPos;
 
-	if (isAdd) {
+  if (isAdd) {
 		// push a new word to the list 
 		wordList.push(generateWord())
 	}		
 
-  if (isRemove) {
+	if (isRemove) {
   	// remove word at cursor
-		removeWord();
-	}
+  	removeWord();
+  }
 
 	// Grab or deselect word if there's a joystick click
 	if (isJoystickClick) {

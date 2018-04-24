@@ -5,8 +5,8 @@
 
   file: words.js 
   authors: jerry bonnell and gururaj shriram
-  date last modified: 22 apr 2018
-  last modified by: jerry
+  date last modified: 24 apr 2018
+  last modified by: guru
 */
 
 // current words displayed on the screen 
@@ -68,6 +68,9 @@ function generateWord() {
 
   width = textWidth(word) + padding[0] * 2;
   height = 16 + padding[1] * 2;
+
+  // play add sound
+  addSound.play();
 
   return {
     'word': word,
