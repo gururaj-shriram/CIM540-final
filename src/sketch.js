@@ -3,11 +3,13 @@ CIM540/CIM542 Final Project
 
 file: sketch.js 
 authors: jerry bonnell and gururaj shriram
-date last modified: 24 apr 2018
-last modified by: guru
+date last modified: 26 apr 2018
+last modified by: jerry
 */
 
 const IS_USING_ARDUINO_CONTROLLER = false;
+const WITHOUT_SOUND = 0; 
+const WITH_SOUND = 1;
 
 var backgroundColor = "#242930";
 
@@ -70,26 +72,26 @@ function setup() {
 	removeSound.setVolume(0.1);
 	snapSound.setVolume(0.1);
 
-	windowResized(); 
+	windowResized();
 	frameRate(fps); // attempt to match the user-specified frame rate
 
 	// this is a hack to make sure text width provides the correct width 
-	wordList.push(generateWord()); 
+	wordList.push(generateWord(WITHOUT_SOUND));
 	wordList.pop();
 
 	if (IS_USING_ARDUINO_CONTROLLER) {
 		serial = new p5.SerialPort();
 		serial.open(serialPort);
 
-    // serial callbacks
-    serial.on('data', gotData);
-    serial.on('error', gotError);
-    serial.on('open', gotOpen);
-  }
+		// serial callbacks
+		serial.on('data', gotData);
+		serial.on('error', gotError);
+		serial.on('open', gotOpen);
+	}
 }
 
 function draw() {
-	updateColors(); 
+	updateColors();
 	updateCursor();
 	render();
 }
@@ -122,31 +124,31 @@ function updateCursor() {
 	if (!IS_USING_ARDUINO_CONTROLLER) {
 		cursorX = mouseX;
 		cursorY = mouseY;
-	} 
+	}
 }
 
 function render() {
-	background(backgroundColor); 
+	background(backgroundColor);
 
 	//noStroke();
 	stroke(255, 255, 255);
-  fill(255, 255, 255); // white text
+	fill(255, 255, 255); // white text
 
-  renderWords();
+	renderWords();
 
-  if (IS_USING_ARDUINO_CONTROLLER) {
-    fill(255, 255, 255); // white text
-    text('X', cursorX, cursorY);
-  }
+	if (IS_USING_ARDUINO_CONTROLLER) {
+		fill(255, 255, 255); // white text
+		text('X', cursorX, cursorY);
+	}
 }
 
 function keyPressed() {
-  if (keyCode === 80) { // pressing p 
+	if (keyCode === 80) { // pressing p 
 		// push a new word to the list 
-		wordList.push(generateWord())
-  } else if (keyCode === 82) { // pressing r 
-  	removeWord();
-  }
+		wordList.push(generateWord(WITH_SOUND));
+	} else if (keyCode === 82) { // pressing r 
+		removeWord();
+	}
 }
 
 function mousePressed() {
@@ -174,38 +176,38 @@ function gotData() {
 	var data = serial.readLine().trim().split(' ');
 
 
-  // Empty packet from arduino
-  if (data.length !== 5) {
-  	return;
-  }
+	// Empty packet from arduino
+	if (data.length !== 5) {
+		return;
+	}
 
-  console.log(data);
+	console.log(data);
 
-  var xPos = constrain(int(data[0]), minPanX, maxPanX);
-  xPos = map(xPos, minPanX, maxPanX, 0 + offset, width - offset);
+	var xPos = constrain(int(data[0]), minPanX, maxPanX);
+	xPos = map(xPos, minPanX, maxPanX, 0 + offset, width - offset);
 
-  var yPos = constrain(int(data[1]), minTiltY, maxTiltY);
-  yPos = map(yPos, minTiltY, maxTiltY, 0 + offset, height - offset);
-  
-  var isAdd = int(data[2]) === 1 ? true : false;
-  var isRemove = int(data[3]) === 1 ? true : false;
-  var isJoystickClick = int(data[4]) === 1 ? true : false;
+	var yPos = constrain(int(data[1]), minTiltY, maxTiltY);
+	yPos = map(yPos, minTiltY, maxTiltY, 0 + offset, height - offset);
 
-  cursorX = xPos;
-  cursorY = yPos;
+	var isAdd = int(data[2]) === 1 ? true : false;
+	var isRemove = int(data[3]) === 1 ? true : false;
+	var isJoystickClick = int(data[4]) === 1 ? true : false;
 
-  if (isAdd) {
+	cursorX = xPos;
+	cursorY = yPos;
+
+	if (isAdd) {
 		// push a new word to the list 
 		wordList.push(generateWord())
-	}		
+	}
 
 	if (isRemove) {
-  	// remove word at cursor
-  	removeWord();
-  }
+		// remove word at cursor
+		removeWord();
+	}
 
 	// Grab or deselect word if there's a joystick click
 	if (isJoystickClick) {
-		moveWords();		
+		moveWords();
 	}
 }
