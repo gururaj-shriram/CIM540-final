@@ -2,8 +2,10 @@
 
 // The joystick on the controller is rotated 90 degrees counterclockwise
 // from where it should be. Hence, "X" corresponds to the "Y" direction
-// and vice-a-versa. Further the "Y" on the joystick ("X" for the controller) is flipped, 
-// so that 0 is actually 1023 and vice-a-versa
+// and vice-a-versa. The "Y" on the joystick ("X" for the controller) is flipped, 
+// so that 0 is actually 1023 and vice-a-versa. The "X" on the joystick ("Y" for the 
+// controller) is flipped for practical purposes since the pan and tilt device is
+// inverted to allow the laser to move higher
 
 // Changeable pins
 const int joystickYPin = A0; 
@@ -61,8 +63,9 @@ void loop() {
     temp = 0;
   }
   
+  // Add/Subtract a small offset so that the movements are relatively smooth
   servoVal = prevPanVal + temp;
-  servoVal = constrain(servoVal, minPanValue, maxPanValue);
+  servoVal = constrain(servoVal, minPanValue, maxPanValue); // in case it's over the threshold
   prevPanVal = servoVal;
   
   // Write pan val first
@@ -73,19 +76,20 @@ void loop() {
 
   // Move tilt
   joystickVal = analogRead(joystickYPin);  
-  
   temp = map(joystickVal, 0, 1023, minServoOffset, maxServoOffset);
 
   // To decrease sensitivity
   if (temp >= -1 && temp <= 1) {
     temp = 0;
   }
-  
+
+  // Add/Subtract a small offset so that the movements are relatively smooth
   servoVal = prevTiltVal + temp;
-  servoVal = constrain(servoVal, minTiltValue, maxTiltValue);
+  servoVal = constrain(servoVal, minTiltValue, maxTiltValue); // in case it's over the threshold
   prevTiltVal = servoVal;
   
   // Write tilt val second
+  // It is flipped for the p5 canvas
   Serial.print(maxTiltValue - servoVal);
   Serial.print(" ");
   tilt.writeMicroseconds(servoVal);

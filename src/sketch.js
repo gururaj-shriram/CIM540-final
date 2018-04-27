@@ -22,12 +22,15 @@ var serial;
 // change based on arduino port
 var serialPort = '/dev/cu.usbmodem1411';
 
+// global var to store arduino controller data
+var data;
+
 // calibrate these parameters before running if the Arduino controller 
 // is used
-var minPanX = 507;
-var maxPanX = 1105;
-var minTiltY = 1151;
-var maxTiltY = 1400;
+var minPanX = 600;
+var maxPanX = 2300;
+var minTiltY = 900;
+var maxTiltY = 2300;
 
 // transition array to animate coloring of words
 var colors = [
@@ -136,6 +139,8 @@ function render() {
 
 	renderWords();
 
+	// Because the laser is not 100% reliable, use
+	// an X to indicate current position
 	if (IS_USING_ARDUINO_CONTROLLER) {
 		fill(255, 255, 255); // white text
 		text('X', cursorX, cursorY);
@@ -148,6 +153,16 @@ function keyPressed() {
 		wordList.push(generateWord(WITH_SOUND));
 	} else if (keyCode === 82) { // pressing r 
 		removeWord();
+	} else if (keyCode == 83) { // pressing s to (s)tart min calibration
+		if (data !== undefined && data.length === 5) {
+			minPanX = int(data[0]);
+			minTiltY = int(data[1]);
+		}
+	} else if (keyCode == 69) { // pressing e to (e)nd max calibration
+		if (data !== undefined && data.length === 5) {
+			maxPanX = int(data[0]);
+			maxTiltY = int(data[1]);
+		}
 	}
 }
 
@@ -173,7 +188,7 @@ function gotData() {
 
 	// data is provided as a space separated string from the Arduino controller as so:
 	// panValue tiltValue addButtonState removeButtonState joystickButtonState
-	var data = serial.readLine().trim().split(' ');
+	data = serial.readLine().trim().split(' ');
 
 
 	// Empty packet from arduino
@@ -193,12 +208,13 @@ function gotData() {
 	var isRemove = int(data[3]) === 1 ? true : false;
 	var isJoystickClick = int(data[4]) === 1 ? true : false;
 
+	// update cursor positions
 	cursorX = xPos;
 	cursorY = yPos;
 
 	if (isAdd) {
 		// push a new word to the list 
-		wordList.push(generateWord())
+		wordList.push(generateWord(WITH_SOUND))
 	}
 
 	if (isRemove) {
