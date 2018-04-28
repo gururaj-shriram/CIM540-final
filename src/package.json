@@ -1,23 +1,23 @@
 {
-  "name": "word_story",
+  "name": "word_jam",
   "version": "1.0.0",
-  "description": "Word Story",
+  "description": "Word Jam",
   "main": "sketch.js",
   "scripts": {
     "start": "node startserver.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gururaj-shriram/CIM540-final.git"
+    "url": "git+https://github.com/gururaj-shriram/WordJam.git"
   },
   "author": "jerry bonnell and gururaj shriram",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/gururaj-shriram/CIM540-final/issues"
+    "url": "https://github.com/gururaj-shriram/WordJam/issues"
   },
   "dependencies": {
     "serialport": "^4.0.3",
     "ws": "^1.1.1"
   },
-  "homepage": "https://github.com/gururaj-shriram/CIM540-final#readme"
+  "homepage": "https://github.com/gururaj-shriram/WordJam#readme"
 }
