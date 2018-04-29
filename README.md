@@ -44,9 +44,9 @@ If everything works well, a cursor ('X') should appear on screen.
 Before we're ready to roll, the controller should be calibrated to the dimensions of the surface or screen where Word Jam is being played. Calibration is simple and has the following steps:
 
 1. Move the laser/cursor to the top left of the canvas
-2. Press the `s` key on the keyboard
+2. Repeatedly press the `s` key on the keyboard until the cursor changes position to the top left of the canvas
 3. Move the laser/cursor to the bottom right of the canvas
-4. Press the `e` key on the keyboard
+4. Repeatedly press the `e` key on the keyboard until the cursor changes position to the bottom right of the canvas
 
 And now, everything's all set to start Word Jamming!
 
