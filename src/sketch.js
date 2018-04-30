@@ -20,7 +20,7 @@ var offset = 10;
 var serial;
 
 // change based on arduino port
-var serialPort = '/dev/cu.usbmodem1411';
+var serialPort = '/dev/cu.usbmodem1421';
 
 // global var to store arduino controller data
 var data;

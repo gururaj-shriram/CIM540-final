@@ -20,8 +20,8 @@ const int minPanValue = 600;
 const int maxPanValue = 2300;
 const int minTiltValue = 900;
 const int maxTiltValue = 2300;
-const int minServoOffset = -5;
-const int maxServoOffset = 5;
+const int minServoOffset = -3;
+const int maxServoOffset = 3;
 const int doSomethingVal = 1;
 const int doNothingVal = 0;
 
