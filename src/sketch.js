@@ -3,7 +3,7 @@ CIM540/CIM542 Final Project
 
 file: sketch.js 
 authors: jerry bonnell and gururaj shriram
-date last modified: 26 apr 2018
+date last modified: 29 apr 2018
 last modified by: jerry
 */
 
@@ -51,7 +51,7 @@ var colorFrame = 0;
 // how long should the duration of a color last? (in seconds)?
 var colorDuration = 2.0;
 // frames per second
-var fps = 60;
+var fps = 30;
 
 var addSound;
 var removeSound;

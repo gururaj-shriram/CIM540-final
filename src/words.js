@@ -14,42 +14,22 @@ var wordList = [];
 // part of speech tags 
 var nounTags = ['nn', 'nns'];
 var verbTags = ['vb', 'vbd', 'vbg', 'vbn', 'vbp', 'vbz'];
-//var otherTags = ['prp', 'prp$', 'cc'];
-//var otherTags = ['cc', 'cd', 'dt', 'ex', 'in', 'jj', 'jjr', 'jjs',
-//  'md', 'prp', 'prp$', 'rb', 'rbr', 'rbs', 'to', 'uh', 'wdt', 'wp', 'wp$', 'wrb'
-//];
 // get a list of stopwords, e.g. the, you, me, but, .. 
-//var stopwords = RiTa.STOP_WORDS;
-var stopwords = ["the", "and", "a", "of", "in", "i", "you", "is", "to",
-  "that", "it", "for", "on", "have", "with", "this", "be", "not", "are", "as", "was", "but", "or", "from", "my", "at", "if", "they", "your", "all", "he",
-  "by", "one", "me", "what", "so", "can", "will", "do", "an", "about",
-  "we", "just", "would", "there", "no", "like", "out", "his", "has",
-  "up", "more", "who", "when", "don't", "some", "had", "them", "any", "their", "it's", "only", "which", "i'm", "been", "other", "were", "how", "then",
-  "now", "her", "than", "she", "well", "also", "us", "very", "because",
-  "am", "here", "could", "even", "him", "into", "our", "much",
-  "too", "did", "should", "over", "want", "these", "may", "where", "most",
-  "many", "those", "does", "why", "please", "off", "going", "its", "i've",
-  "down", "that's", "can't", "you're", "didn't", "another", "around",
-  "must", "few", "doesn't", "every", "yes", "each", "maybe",
-  "i'll", "away", "doing", "oh", "else", "isn't", "he's", "there's",
-  "won't", "ok", "they're", "yeah", "mine", "we're", "what's", "shall",
-  "she's", "hello", "okay", "here's"
-];
-var otherTags = stopwords;
+var stopwords = RiTa.STOP_WORDS;
 var storywords = ['he', 'she', 'you', 'me', 'they', 'a', 'but', 'the', 'it',
-  'and', 'are'
+  'and', 'are', 'aren\'t', 'will', 'were', 'am', 'I', 'him', 'her', 'can',
+  'could', 'should', 'would', 'shall', 'won\'t', 'is', 'be'
 ];
 var punctuation = ['.', '?', '!', ','];
 
 // probability of selecting a stopword, noun, verb, other tag, respectively
 // later, this can be weighted and/or changed dynamically 
 var probabilities = [
-  [stopwords, 0.2],
-  [nounTags, 0.2],
-  [verbTags, 0.2],
-  [otherTags, 0.1],
-  [storywords, 0.2],
-  [punctuation, 0.1]
+  [stopwords, 0.1],
+  [nounTags, 0.25],
+  [verbTags, 0.3],
+  [storywords, 0.3],
+  [punctuation, 0.05]
 ];
 var uuid = 0;
 // offset width and height
@@ -60,27 +40,6 @@ var padding = [14, 14];
 var hitbox = [15, 45];
 
 const yOffset = 15;
-
-function updateProbabilities(index) {
-  // takes in an index of part of speech tag that was selected 
-  // and reduces its probability while increasing the probability 
-  // of the other tags by a slight amount 
-  var sum = 0;
-
-  probabilities[index][1] -= 0.1; // decrease slightly 
-  for (var i = 0; i < probabilities.length; i++) {
-    if (i !== index) {
-      probabilities[i][1] += 0.05; // increase slightly 
-    }
-    sum += probabilities[i][1];
-  }
-  // normalize probabilities so they sum up to 1 
-  var prob_factor = 1 / sum;
-  for (var i = 0; i < probabilities.length; i++) {
-    probabilities[i][1] *= prob_factor;
-  }
-  console.log(probabilities);
-}
 
 function generateWord(playSound) {
   var word;
@@ -99,7 +58,6 @@ function generateWord(playSound) {
     if (value <= probability_sum) {
       // update the probabilities for next time, where the i'th index 
       // denotes the part of speech tag selected (and the one to decrease)
-      updateProbabilities(i);
       var index = parseInt(Math.random() * arr.length);
       // if the arr is from the stopwords list..
       if (arr === stopwords) {
@@ -137,6 +95,8 @@ function generateWord(playSound) {
     "height": height,
     "previous": undefined,
     "next": undefined,
+    "wordSnappingWith": undefined,
+    "wordSnappingFrom": undefined, 
     "id": uuid++,
     "color": [globalColor[0], globalColor[1], globalColor[2]]
   }
@@ -189,16 +149,20 @@ function moveWords() {
     }
   } else {
     // case where we want to de-select 
-    if (currentSentence.tail.next !== undefined) {
-      // commit the snap 
+    if (currentSentence.head.wordSnappingWith !== undefined) {
+      var snappingTo = currentSentence.head.wordSnappingWith;
+      // are we snapping to the left or right 
       snapSound.play();
-      var next = currentSentence.tail.next;
-      next.previous = currentSentence.tail;
-    } else if (currentSentence.head.previous !== undefined) {
-      snapSound.play();
-      var previous = currentSentence.head.previous;
-      previous.next = currentSentence.head;
-    }
+      if (currentSentence.head.wordSnappingFrom === 'left') {
+        // commit the snap 
+        snappingTo.previous = currentSentence.tail; 
+        currentSentence.tail.next = snappingTo;
+      } else if (currentSentence.head.wordSnappingFrom === 'right') {
+        // the static word/sentence is on the LHS of the hovering word 
+        snappingTo.next = currentSentence.head; 
+        currentSentence.head.previous = snappingTo;
+      }
+    } 
 
     currentSentence = undefined;
     currentSentenceSet = undefined;
@@ -255,8 +219,10 @@ function renderWords() {
         x = cursorX - selectedOffsets[0];
         y = cursorY - selectedOffsets[1];
         // note that this updates the model 
-        currentSentence.head.previous = undefined;
-        currentSentence.tail.next = undefined;
+        //currentSentence.head.previous = undefined;
+        //currentSentence.tail.next = undefined;
+        currentSentence.head.wordSnappingWith = undefined;
+        currentSentence.head.wordSnappingFrom = undefined;
         var listWidth = calculateListLocations(x, y);
         var listHeight = currentSentence.head.height;
         //ellipse(x, y, 5, 5);  
@@ -282,7 +248,8 @@ function renderWords() {
               y = wordObj2.y;
               // also update the model here
               calculateListLocations(x, y);
-              currentSentence.tail.next = wordObj2;
+              currentSentence.head.wordSnappingWith = wordObj2;
+              currentSentence.head.wordSnappingFrom = "left";
               return;
               // check hitbox on the right 
             } else if (wordObj2.next === undefined &&
@@ -292,7 +259,8 @@ function renderWords() {
               y = wordObj2.y;
               // also update the model here
               calculateListLocations(x, y);
-              currentSentence.head.previous = wordObj2;
+              currentSentence.head.wordSnappingWith = wordObj2;
+              currentSentence.head.wordSnappingFrom = "right";
               return;
             }
           }
